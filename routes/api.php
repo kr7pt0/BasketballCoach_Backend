@@ -23,7 +23,8 @@ Route::middleware('auth:api')->group(function () {
     
     Route::post('/logout', 'Auth\LoginController@logout');
 
-    Route::get('/user', function (Request $request) {
-        return $request->user();
+    Route::namespace('Api')->group(function () {
+        
+        Route::get('/dashboard', 'HomeController@dashboard');
     });
 });
