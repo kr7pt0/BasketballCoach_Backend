@@ -7,4 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 class Shot extends Model
 {
     protected $visible = ['x', 'y', 'success'];
+
+    protected $fillable = ['x', 'y', 'success'];
 }

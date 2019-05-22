@@ -25,17 +25,23 @@ Route::middleware('auth:api')->group(function () {
 
     Route::namespace('Api')->group(function () {
         
+        // Rest for App
+
         Route::get('/dashboard', 'HomeController@dashboard');
 
         Route::get('/statistics', 'HomeController@statistics');
         
         Route::get('/history', 'HomeController@history');
 
-        Route::post('/game/start', 'HomeController@gameStart');
+        // Rest for python
 
-        Route::post('/game/cancel', 'HomeController@gameCancel');
+        Route::get('/game/check', 'GameController@gameCheck');
 
-        Route::post('/games', 'HomeController@saveGame');
+        Route::post('/game/start', 'GameController@gameStart');
+
+        Route::post('/game/cancel', 'GameController@gameCancel');
+
+        Route::post('/game', 'GameController@saveGame');
     
     });
 });

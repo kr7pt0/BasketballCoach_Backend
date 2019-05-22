@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\User;
+use App\Game;
+use App\Shot;
+
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -76,22 +79,5 @@ class HomeController extends Controller
         return response()->json([
             'history'   => $games
         ]);
-    }
-
-    public function saveGame(Request $request)
-    {
-        $user = $request->user();
-
-        return response()->json(['status' => 'ok']);
-    }
-
-    public function gameStart(Request $request)
-    {
-
-    }
-
-    public function gameCancel(Request $request)
-    {
-        
     }
 }
