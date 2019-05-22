@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 
 
-define ('DASHBOARD_RECENT_GAME_COUNT', 3);
+define ('DASHBOARD_RECENT_GAME_COUNT', 10);
 
 
 class HomeController extends Controller
@@ -60,6 +60,21 @@ class HomeController extends Controller
         return response()->json([
             'history'   => $games,
             'positions' => $positions
+        ]);
+    }
+
+    public function history(Request $request)
+    {
+        $user = $request->user();
+        $date = $request->input('date', date('Y-m-d'));
+
+        $games = $user->games()
+                ->whereDate('created_at', $date)
+                ->orderBy('created_at', 'asc')
+                ->get();
+
+        return response()->json([
+            'history'   => $games
         ]);
     }
 

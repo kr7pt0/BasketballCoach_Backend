@@ -28,6 +28,8 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/dashboard', 'HomeController@dashboard');
 
         Route::get('/statistics', 'HomeController@statistics');
+        
+        Route::get('/history', 'HomeController@history');
 
         Route::post('/games', 'HomeController@saveGame');
     });
