@@ -20,7 +20,7 @@ class HomeController extends Controller
         $tryCount = $games->sum('try_count');
         $successCount = $games->sum('score');
 
-        $recentGames = $games->latest()->take(DASHBOARD_RECENT_GAME_COUNT)->get();
+        $recentGames = $games->oldest()->take(DASHBOARD_RECENT_GAME_COUNT)->get();
         $recentTryCount = $recentGames->sum('try_count');
         $recentSuccessCount = $recentGames->sum('score');
 
@@ -30,7 +30,7 @@ class HomeController extends Controller
             'total_game_plays'  => $games->count(),
             'overall_accuracy'  => round($successCount / $tryCount, 3),
             'recent_accuracy'   => round($recentSuccessCount / $recentTryCount, 3),
-            'data'              => $recentGames,
+            'history'           => $recentGames,
             'positions'         => $positions
         ]);
     }

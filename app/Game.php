@@ -6,8 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Game extends Model
 {
-    //
-    protected $visible = ['release_angle', 'release_time', 'elbow_angle', 'leg_angle'];
+    protected $visible = ['release_angle', 'release_time', 'elbow_angle', 'leg_angle', 'created_at'];
     
     public function shots()
     {
