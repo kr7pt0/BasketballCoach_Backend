@@ -26,5 +26,9 @@ Route::middleware('auth:api')->group(function () {
     Route::namespace('Api')->group(function () {
         
         Route::get('/dashboard', 'HomeController@dashboard');
+
+        Route::get('/statistics', 'HomeController@statistics');
+
+        Route::post('/games', 'HomeController@saveGame');
     });
 });

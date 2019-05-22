@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 
 define ('DASHBOARD_RECENT_GAME_COUNT', 3);
@@ -20,11 +21,12 @@ class HomeController extends Controller
         $tryCount = $games->sum('try_count');
         $successCount = $games->sum('score');
 
-        $recentGames = $games->oldest()->take(DASHBOARD_RECENT_GAME_COUNT)->get();
+        $recentGames = $games->latest()->take(DASHBOARD_RECENT_GAME_COUNT)->get();
         $recentTryCount = $recentGames->sum('try_count');
         $recentSuccessCount = $recentGames->sum('score');
 
         $positions = $recentGames->load('shots')->map->shots->flatten(1);
+        $recentGames = $recentGames->reverse()->values();
 
         return response()->json([
             'total_game_plays'  => $games->count(),
@@ -33,5 +35,38 @@ class HomeController extends Controller
             'history'           => $recentGames,
             'positions'         => $positions
         ]);
+    }
+
+    public function statistics(Request $request)
+    {
+        $user = $request->user();
+        $recentMode = $request->input('mode', 'tries');
+        $recentPeriod = $request->input('period', 1);
+        // default period 1 is 'all' for tries mode, and 'today' for day mode
+
+        $games = $user->games()->latest();
+        if ($recentMode == 'tries') {
+            if ($recentPeriod > 1) {
+                $games = $games->take($recentPeriod);
+            }
+        } else { // day
+            $since = Carbon::now()->subDays($recentPeriod);
+            $games = $games->where('created_at', '>', $since);
+        }
+        $games = $games->get()->reverse()->values();
+
+        $positions = $games->load('shots')->map->shots->flatten(1);
+
+        return response()->json([
+            'history'   => $games,
+            'positions' => $positions
+        ]);
+    }
+
+    public function saveGame(Request $request)
+    {
+        $user = $request->user();
+
+        return response()->json(['status' => 'ok']);
     }
 }
