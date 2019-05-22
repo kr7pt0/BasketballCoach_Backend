@@ -30,8 +30,8 @@ class HomeController extends Controller
 
         return response()->json([
             'total_game_plays'  => $games->count(),
-            'overall_accuracy'  => round($successCount / $tryCount, 3),
-            'recent_accuracy'   => round($recentSuccessCount / $recentTryCount, 3),
+            'overall_accuracy'  => $tryCount == 0 ? 0 : round($successCount / $tryCount, 3),
+            'recent_accuracy'   => $recentTryCount == 0 ? 0 : round($recentSuccessCount / $recentTryCount, 3),
             'history'           => $recentGames,
             'positions'         => $positions
         ]);
@@ -83,5 +83,15 @@ class HomeController extends Controller
         $user = $request->user();
 
         return response()->json(['status' => 'ok']);
+    }
+
+    public function gameStart(Request $request)
+    {
+
+    }
+
+    public function gameCancel(Request $request)
+    {
+        
     }
 }

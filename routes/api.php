@@ -31,6 +31,11 @@ Route::middleware('auth:api')->group(function () {
         
         Route::get('/history', 'HomeController@history');
 
+        Route::post('/game/start', 'HomeController@gameStart');
+
+        Route::post('/game/cancel', 'HomeController@gameCancel');
+
         Route::post('/games', 'HomeController@saveGame');
+    
     });
 });
