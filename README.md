@@ -1,4 +1,3 @@
-Make sure you installed apache2 and mysql on the server.
 # 1. Install LAMP on the server
 ## Install Apache
 	sudo apt update
