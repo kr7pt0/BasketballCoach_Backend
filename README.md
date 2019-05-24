@@ -1,72 +1,66 @@
-<p align="center"><img src="https://laravel.com/assets/img/components/logo-laravel.svg"></p>
+Make sure you installed apache2 and mysql on the server.
+1. Install LAMP on the server
+1) Install Apache
+	sudo apt update
+	sudo apt install apache2
+2) Install MySQL
+	sudo apt install mysql-server
+	sudo mysql_secure_installation
+	!!! Set default root password empty when it's asked	
+3) Install PHP
+	sudo apt install php libapache2-mod-php php-mysql
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/d/total.svg" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/v/stable.svg" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/license.svg" alt="License"></a>
-</p>
+2. Install DB & Web Backend
+1) Install DB
+	sudo mysql -u root -p
+	Press Enter and it'll show you mysql shell. Run following command to create database.
+		CREATE DATABASE IF NOT EXISTS basketballcoach;
+2) Install Web Backend
+	- Install composer
+		sudo apt-get install composer
+	- Git clone the backend repository and install required packages
+		git clone https://github.com/naldokan/BasketballCoach_Backend
+		composer install
+	- Configuration of webapp backend
+		cd BasketballCoach_Backend
+		cp .env.example .env
+		change following items in .env file
+			DB_DATABASE=basketballcoach
+			DB_USERNAME=root
+			DB_PASSWORD=
+		php artisan key:generate
+		php artisan migrate
+		check if web backend is working
+			php artisan serve
+			Go to web browser and visit "localhost:8000" to check if Laravel default page is opening.
 
-## About Laravel
-
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
-
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
-
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
-
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1400 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-## Laravel Sponsors
-
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
-
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[British Software Development](https://www.britishsoftware.co)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- [UserInsights](https://userinsights.com)
-- [Fragrantica](https://www.fragrantica.com)
-- [SOFTonSOFA](https://softonsofa.com/)
-- [User10](https://user10.com)
-- [Soumettre.fr](https://soumettre.fr/)
-- [CodeBrisk](https://codebrisk.com)
-- [1Forge](https://1forge.com)
-- [TECPRESSO](https://tecpresso.co.jp/)
-- [Runtime Converter](http://runtimeconverter.com/)
-- [WebL'Agence](https://weblagence.com/)
-- [Invoice Ninja](https://www.invoiceninja.com)
-- [iMi digital](https://www.imi-digital.de/)
-- [Earthlink](https://www.earthlink.ro/)
-- [Steadfast Collective](https://steadfastcollective.com/)
-- [We Are The Robots Inc.](https://watr.mx/)
-- [Understand.io](https://www.understand.io/)
-- [Abdel Elrafa](https://abdelelrafa.com)
-- [Hyper Host](https://hyper.host)
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-source software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+	- Deploying web backend as permanent web service using apache2
+		sudo nano /etc/apache2/sites-available/laravel.conf
+		Write down following content
+			<VirtualHost *:80>   
+			     ServerAdmin admin@local.basketballcoach.com
+			     DocumentRoot PATH_TO_THE_PROJECT_FOLDER/public (e.g, /home/osboxes/Tasks/Basketball/BasketballCoach_Backend/public)
+			     ServerName local.basketballcoach.com
+	     		     <Directory PATH_TO_THE_PROJECT_FOLDER/public (e.g, /home/osboxes/Tasks/Basketball/BasketballCoach_Backend/public)>
+	          	     	Options +FollowSymlinks
+			        AllowOverride All
+	        		Require all granted
+			     </Directory>
+	
+			     ErrorLog ${APACHE_LOG_DIR}/error.log
+			     CustomLog ${APACHE_LOG_DIR}/access.log combined
+			</VirtualHost>
+		Save file
+		sudo a2dissite 000-default.conf
+		sudo a2ensite basketballcoach
+		sudo a2enmod rewrite
+		sudo systemctl restart apache2
+		Check if deployment is successful:
+			Open web browser and visit ip address of the PC. (e.g, http://192.168.200.69)
+			This should open a Laravel default page which was shown in the above
+	
+			If page shows php code of index.php do following to figure that issue out.
+				sudo apt-get install libapache2-mod-php7.2
+				sudo service apache2 restart
+			If you can't connect to the server from other pcs but can on localhost, try to disable firewall
+				sudo ufw disable
