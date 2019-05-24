@@ -1,21 +1,21 @@
 Make sure you installed apache2 and mysql on the server.
-1. Install LAMP on the server
-1) Install Apache
+# 1. Install LAMP on the server
+## Install Apache
 	sudo apt update
 	sudo apt install apache2
-2) Install MySQL
+## Install MySQL
 	sudo apt install mysql-server
 	sudo mysql_secure_installation
 	!!! Set default root password empty when it's asked	
-3) Install PHP
+## Install PHP
 	sudo apt install php libapache2-mod-php php-mysql
 
-2. Install DB & Web Backend
-1) Install DB
+# 2. Install DB & Web Backend
+## Install DB
 	sudo mysql -u root -p
 	Press Enter and it'll show you mysql shell. Run following command to create database.
 		CREATE DATABASE IF NOT EXISTS basketballcoach;
-2) Install Web Backend
+## Install Web Backend
 	- Install composer
 		sudo apt-get install composer
 	- Git clone the backend repository and install required packages
