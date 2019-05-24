@@ -30,6 +30,7 @@ class GameController extends Controller
 
     public function saveGame(Request $request)
     {
+        $gameMode = $request->input('gameMode', null);
         $releaseAngle = $request->input('releaseAngle', null);
         $releaseTime = $request->input('releaseTime', null);
         $elbowAngle = $request->input('elbowAngle', null);
@@ -50,7 +51,8 @@ class GameController extends Controller
 
         $user = $request->user();
 
-        if ($user->gaming) {
+//      if ($user->gaming)
+        {
             $shots = [];
             foreach ($positions as $p) {
                 $shots[] = [
@@ -61,7 +63,7 @@ class GameController extends Controller
             }
 
             $game = $user->games()->create([
-                'mode'          => 'FREE_THROW',
+                'mode'          => $gameMode,
                 'release_angle' => $releaseAngle,
                 'release_time'  => $releaseTime,
                 'elbow_angle'   => $elbowAngle,
@@ -76,7 +78,7 @@ class GameController extends Controller
 
             return response()->json(['status' => 'ok']);
         }
-        return response()->json(['status' => 'not started'], 403);
+//        return response()->json(['status' => 'not started'], 403);
     }
 
     public function gameStart(Request $request)
