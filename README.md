@@ -34,7 +34,7 @@
 			Go to web browser and visit "localhost:8000" to check if Laravel default page is opening.
 
 	- Deploying web backend as permanent web service using apache2
-		sudo nano /etc/apache2/sites-available/laravel.conf
+		sudo nano /etc/apache2/sites-available/basketballcoach.conf
 		Write down following content
 			<VirtualHost *:80>   
 			     ServerAdmin admin@local.basketballcoach.com
