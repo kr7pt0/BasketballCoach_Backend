@@ -19,6 +19,7 @@
 		sudo apt-get install composer
 	- Git clone the backend repository and install required packages
 		git clone https://github.com/naldokan/BasketballCoach_Backend
+        cd BasketballCoach_Backend
 		composer install
 	- Configuration of webapp backend
 		cd BasketballCoach_Backend
