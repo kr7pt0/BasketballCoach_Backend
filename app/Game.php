@@ -13,5 +13,10 @@ class Game extends Model
     public function shots()
     {
         return $this->hasMany(Shot::class);
-    } 
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

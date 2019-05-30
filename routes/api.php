@@ -32,6 +32,8 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/statistics', 'HomeController@statistics');
         
         Route::get('/history', 'HomeController@history');
+        
+        Route::get('/leaderboard', 'HomeController@leaderboard');
 
         // Rest for python
 
