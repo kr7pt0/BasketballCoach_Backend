@@ -46,25 +46,60 @@ class HomeController extends Controller
     public function statistics(Request $request)
     {
         $user = $request->user();
-        $recentMode = $request->input('mode', 'tries');
-        $recentPeriod = $request->input('period', 1);
-        // default period 1 is 'all' for tries mode, and 'today' for day mode
+        $mode = $request->input('mode', 'weekly');
+        $date = $request->input('date', date('Y-m-d'));
 
-        $games = $user->games()->latest();
-        if ($recentMode == 'tries') {
-            if ($recentPeriod > 1) {
-                $games = $games->take($recentPeriod);
-            }
-        } else { // day
-            $since = Carbon::now()->subDays($recentPeriod);
-            $games = $games->where('created_at', '>', $since);
+        if ($mode != 'weekly' && $mode != 'monthly' && $mode != 'yearly') {
+            $mode = 'weekly';
         }
-        $games = $games->get()->reverse()->values();
 
-        $positions = $games->load('shots')->map->shots->flatten(1);
+        $select = $where = $groupby = '';
+
+        switch ($mode) {
+            case 'weekly':
+                $start = sprintf('SUBDATE(\'%s\', WEEKDAY(\'%s\'))', $date, $date);
+                $end = sprintf('ADDDATE(\'%s\', 7 - WEEKDAY(\'%s\'))', $date, $date);
+                $where .= sprintf('created_at >= %s AND created_at <= %s', $start, $end);
+
+                $groupby = 'DATE_FORMAT(created_at, \'%b %d %Y\')';
+                break;
+
+            case 'monthly':
+                $where .= sprintf('DATE_FORMAT(created_at, \'%Y%m\') = DATE_FORMAT(\'%s\', \'%Y%m\')', $date);
+                $groupby = 'DATE_FORMAT(created_at, \'%b %d %Y\')';
+                break;
+
+            case 'yearly':
+            default:
+                $where .= sprintf('YEAR(created_at) = YEAR(\'%s\')', $date);
+                $groupby = 'DATE_FORMAT(created_at, \'%Y %b\')';
+                break;
+        }
+
+        $select = 'COUNT(games.id) AS game_times,';
+        $select .= 'SUM(games.try_count) AS shots,';
+        $select .= 'SUM(games.score) AS success,';
+        $select .= 'ROUND(AVG(games.release_time), 2) AS release_time,';
+        $select .= 'ROUND(AVG(games.release_angle), 2) AS release_angle,';
+        $select .= 'ROUND(AVG(games.leg_angle), 2) AS leg_angle,';
+        $select .= 'ROUND(AVG(games.elbow_angle), 2) AS elbow_angle,';
+        $select .= $groupby . ' AS xkey';
+
+        $query = sprintf('SELECT %s FROM %s WHERE %s GROUP BY xkey ORDER BY xkey',
+                        $select, 'games', $where);
+        $list = collect(DB::select($query));
+        
+        $positions = Shot::whereRaw($where)->get();
+
+        $select = 'ROUND(AVG(release_time), 2) AS release_time,';
+        $select .= 'ROUND(AVG(release_angle), 2) AS release_angle,';
+        $select .= 'ROUND(AVG(elbow_angle), 2) AS elbow_angle,';
+        $select .= 'ROUND(AVG(leg_angle), 2) AS leg_angle ';
+        $average = Game::selectRaw($select)->whereRaw($where)->first();
 
         return response()->json([
-            'history'   => $games,
+            'list'      => $list,
+            'average'   => $average,
             'positions' => $positions
         ]);
     }
@@ -75,9 +110,9 @@ class HomeController extends Controller
         $date = $request->input('date', date('Y-m-d'));
 
         $games = $user->games()
-                ->whereDate('created_at', $date)
-                ->orderBy('created_at', 'asc')
-                ->get();
+                    ->whereDate('created_at', $date)
+                    ->orderBy('created_at', 'asc')
+                    ->get();
 
         return response()->json([
             'history'   => $games
