@@ -89,14 +89,14 @@ class HomeController extends Controller
                         $select, 'games', $where);
         $list = collect(DB::select($query));
         
-        $positions = Shot::whereRaw($where)->get();
-
         $select = 'ROUND(AVG(release_time), 2) AS release_time,';
         $select .= 'ROUND(AVG(release_angle), 2) AS release_angle,';
         $select .= 'ROUND(AVG(elbow_angle), 2) AS elbow_angle,';
         $select .= 'ROUND(AVG(leg_angle), 2) AS leg_angle ';
         $average = Game::selectRaw($select)->whereRaw($where)->first();
-
+        
+        $positions = Shot::whereRaw($where)->get();
+        
         return response()->json([
             'list'      => $list,
             'average'   => $average,
