@@ -35,6 +35,7 @@ class HomeController extends Controller
         $recentGames = $recentGames->reverse()->values();
 
         return response()->json([
+            'user_name'         => $user->name,
             'total_game_plays'  => $games->count(),
             'overall_accuracy'  => $tryCount == 0 ? 0 : round($successCount / $tryCount, 3),
             'recent_accuracy'   => $recentTryCount == 0 ? 0 : round($recentSuccessCount / $recentTryCount, 3),
