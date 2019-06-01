@@ -88,7 +88,11 @@ class HomeController extends Controller
 
         $query = sprintf('SELECT %s FROM %s WHERE %s GROUP BY xkey ORDER BY xkey',
                         $select, 'games', $where);
-        $list = collect(DB::select($query));
+        $list = collect(DB::select($query))->map(function ($value) {
+            $value->shots = intval($value->shots);
+            $value->success = intval($value->success);
+            return $value;
+        });
         
         $select = 'ROUND(AVG(release_time), 2) AS release_time,';
         $select .= 'ROUND(AVG(release_angle), 2) AS release_angle,';
