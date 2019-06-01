@@ -66,7 +66,7 @@ class HomeController extends Controller
                 break;
 
             case 'monthly':
-                $where .= sprintf('DATE_FORMAT(created_at, \'%Y%m\') = DATE_FORMAT(\'%s\', \'%Y%m\')', $date);
+                $where .= sprintf('DATE_FORMAT(created_at, \'%s\') = DATE_FORMAT(\'%s\', \'%s\')', '%Y%m', $date, '%Y%m');
                 $groupby = 'DATE_FORMAT(created_at, \'%b %d %Y\')';
                 break;
 
