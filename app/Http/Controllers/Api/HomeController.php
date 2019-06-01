@@ -73,7 +73,7 @@ class HomeController extends Controller
             case 'yearly':
             default:
                 $where .= sprintf('YEAR(created_at) = YEAR(\'%s\')', $date);
-                $groupby = 'DATE_FORMAT(created_at, \'%Y %b\')';
+                $groupby = 'DATE_FORMAT(created_at, \'%b %Y\')';
                 break;
         }
 
