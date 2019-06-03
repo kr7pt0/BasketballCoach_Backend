@@ -61,18 +61,18 @@ class HomeController extends Controller
                 $start = sprintf('SUBDATE(\'%s\', WEEKDAY(\'%s\'))', $date, $date);
                 $end = sprintf('ADDDATE(\'%s\', 7 - WEEKDAY(\'%s\'))', $date, $date);
                 $where .= sprintf('created_at >= %s AND created_at <= %s', $start, $end);
-                $groupby = 'DATE_FORMAT(created_at, \'%Y-%m-%d\')';
+                $groupby = 'DATE_FORMAT(created_at, \'%Y/%m/%d\')';
                 break;
 
             case 'monthly':
                 $where .= sprintf('DATE_FORMAT(created_at, \'%s\') = DATE_FORMAT(\'%s\', \'%s\')', '%Y%m', $date, '%Y%m');
-                $groupby = 'DATE_FORMAT(created_at, \'%Y-%m-%d\')';
+                $groupby = 'DATE_FORMAT(created_at, \'%Y/%m/%d\')';
                 break;
 
             case 'yearly':
             default:
                 $where .= sprintf('YEAR(created_at) = YEAR(\'%s\')', $date);
-                $groupby = 'DATE_FORMAT(created_at, \'%Y-%m\')';
+                $groupby = 'DATE_FORMAT(created_at, \'%Y/%m\')';
                 break;
         }
 
