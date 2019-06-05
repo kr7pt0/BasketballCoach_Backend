@@ -37,6 +37,7 @@ class HomeController extends Controller
         return response()->json([
             'total_game_plays'  => $games->count(),
             'overall_accuracy'  => $tryCount == 0 ? 0 : round($successCount / $tryCount, 3),
+            'overall_goals'     => $tryCount,
             'recent_accuracy'   => $recentTryCount == 0 ? 0 : round($recentSuccessCount / $recentTryCount, 3),
             'recent_goals'      => $recentSuccessCount,
             'history'           => $recentGames,
