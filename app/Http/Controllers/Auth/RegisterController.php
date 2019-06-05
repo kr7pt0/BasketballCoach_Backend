@@ -74,6 +74,9 @@ class RegisterController extends Controller
 
     protected function registered($request, $user)
     {
-        return response()->json(['token' => $user->api_token], 201);
+        return response()->json([
+            'token' => $user->api_token,
+            'name' => $user->name
+        ], 201);
     }
 }

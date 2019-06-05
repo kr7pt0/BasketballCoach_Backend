@@ -35,10 +35,10 @@ class HomeController extends Controller
         $recentGames = $recentGames->reverse()->values();
 
         return response()->json([
-            'user_name'         => $user->name,
             'total_game_plays'  => $games->count(),
             'overall_accuracy'  => $tryCount == 0 ? 0 : round($successCount / $tryCount, 3),
             'recent_accuracy'   => $recentTryCount == 0 ? 0 : round($recentSuccessCount / $recentTryCount, 3),
+            'recent_goals'      => $recentSuccessCount,
             'history'           => $recentGames,
             'positions'         => $positions
         ]);
@@ -54,25 +54,26 @@ class HomeController extends Controller
             $mode = 'weekly';
         }
 
-        $select = $where = $groupby = '';
+        $select = $groupby = '';
+        $where = sprintf('user_id = \'%s\' AND ', $user->id);
 
         switch ($mode) {
             case 'weekly':
                 $start = sprintf('SUBDATE(\'%s\', WEEKDAY(\'%s\'))', $date, $date);
                 $end = sprintf('ADDDATE(\'%s\', 7 - WEEKDAY(\'%s\'))', $date, $date);
-                $where .= sprintf('created_at >= %s AND created_at <= %s', $start, $end);
-                $groupby = 'DATE_FORMAT(created_at, \'%Y/%m/%d\')';
+                $where .= sprintf('games.created_at >= %s AND games.created_at <= %s', $start, $end);
+                $groupby = 'DATE_FORMAT(games.created_at, \'%Y/%m/%d\')';
                 break;
 
             case 'monthly':
-                $where .= sprintf('DATE_FORMAT(created_at, \'%s\') = DATE_FORMAT(\'%s\', \'%s\')', '%Y%m', $date, '%Y%m');
-                $groupby = 'DATE_FORMAT(created_at, \'%Y/%m/%d\')';
+                $where .= sprintf('DATE_FORMAT(games.created_at, \'%s\') = DATE_FORMAT(\'%s\', \'%s\')', '%Y%m', $date, '%Y%m');
+                $groupby = 'DATE_FORMAT(games.created_at, \'%Y/%m/%d\')';
                 break;
 
             case 'yearly':
             default:
-                $where .= sprintf('YEAR(created_at) = YEAR(\'%s\')', $date);
-                $groupby = 'DATE_FORMAT(created_at, \'%Y/%m\')';
+                $where .= sprintf('YEAR(games.created_at) = YEAR(\'%s\')', $date);
+                $groupby = 'DATE_FORMAT(games.created_at, \'%Y/%m\')';
                 break;
         }
 
@@ -99,7 +100,10 @@ class HomeController extends Controller
         $select .= 'ROUND(AVG(leg_angle), 2) AS leg_angle ';
         $average = Game::selectRaw($select)->whereRaw($where)->first();
         
-        $positions = Shot::whereRaw($where)->get();
+        $query = sprintf('SELECT x, y, success FROM shots' .
+                        ' LEFT JOIN games ON shots.game_id = games.id' .
+                        ' WHERE %s', $where);
+        $positions = collect(DB::select($query));
         
         return response()->json([
             'list'      => $list,
